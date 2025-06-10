@@ -1,0 +1,138 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body,html {
+ width: 100%;
+  height: 100%;
+  background-image: url('background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  width: 1120px;
+  height: 480px;
+  display: flex;
+  gap: 20px;
+  border-radius: 20px;
+  overflow:auto;
+}
+.left-panel {
+  width: 700px;
+  height: 480px;
+  flex: 1;
+  border-radius: 24px;
+  padding: 64px 48px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-around;
+  text-align: center;
+  align-items: center;
+  gap: 32px;
+}
+
+.left-panel img {
+  border-radius: 50%;
+}
+
+
+.left-panel h2 {
+  color: #003f87;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.left-panel p {
+  font-size: 14px;
+  color: #333;
+  margin-top: 10px;
+}
+
+.left-panel .logos img {
+  height: 40px;
+  margin: 10px;
+}
+
+.login-panel {
+  max-width: 456px !important;
+  height: 480px;
+  border-radius:24px;
+  flex: 1;
+  padding: 48px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  /* gap: 24px; */
+}
+
+.login-panel h3 {
+  color: #ffffff;
+  margin-bottom: 16px;
+  text-align: center;
+  letter-spacing: 0%;
+}
+
+.login-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-panel input {
+  width: 360px;
+  height: 30px;
+  border: none;
+  border-radius: 30px;
+  outline: none;
+  font-size: 16px;
+  padding: 10px;
+}
+
+.login-panel .login-button{
+  width: 155px;
+  height: 44px;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  background-color: #003f87;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.login-panel .forgot-password {
+  /* text-align: right; */
+  font-size: 12px;
+}
+
+.login-panel .forgot-password a {
+  color: #ffffff;
+  text-decoration: none;
+}
+.login-panel .label{
+  font-size: 12px;
+  color: #ffffff;
+}
+.access-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #ffffff;
+}
+
+.access-link p {
+  margin-bottom: 5px;
+}
+
+.access-link a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}

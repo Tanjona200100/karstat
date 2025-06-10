@@ -1,0 +1,38 @@
+<%= stylesheet_link_tag :signup, "data-turbo-track": "reload" %>
+<div class="container">
+ 
+
+  <div class="login-panel">
+    <h3>Création de compte</h3>
+    <%= form_with url: signup_path, local: true do |form| %>
+      <%= form.label :login, "Identifiant", class: "label" %>
+      <%= form.text_field :login,  required: true %>
+      
+      <%= form.label :email, "Email", class: "label" %>
+      <%= form.email_field :email, required: true %>
+      
+      <%= form.label :password, "Mot de passe", class: "label" %>
+      <%= form.password_field :password, required: true %>
+      
+      <%= form.label :password_confirmation, "Confirmation", class: "label" %>
+      <%= form.password_field :password_confirmation, required: true %>
+      
+      <%= form.submit "Créer le compte", class: "login-button" %>
+    <% end %>
+    <div class="access-link">
+      <p>Déjà un compte ?</p>
+      <%= link_to "Se connecter", login_path %>
+    </div>
+  </div>
+
+    <div class="left-panel">
+    <center><%= image_tag 'logo.png', alt: 'Votre Logo', width: '100', height: '100'%></center>
+    <h2>Bienvenue sur <strong>KARSAT</strong> la plateforme gouvernementale de gestion de projet.</h2>
+    <p>Assurez-vous d'avoir toutes les autorisations nécessaires pour accéder au site.</p>
+    <div class="logos">
+       <%= image_tag 'logo-gouv.png', alt: 'Votre logo-gouv', width: '84', height: '40'%>
+       <%= image_tag 'logo-mndpt.png', alt: 'Votre logo-mndpt', width: '84', height: '40'%>
+    </div>
+  </div>
+
+</div>

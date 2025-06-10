@@ -1,0 +1,1680 @@
+<!-- Sidebar -->
+ <div class="sidebar">
+      <%= image_tag 'logo.png', alt: 'Votre Logo', width: '70', height: '70'%>  
+
+  <div class="sidebar-item active">
+    <i class="bi bi-map sidebar-icon active" data-target="panel1" title="Carte"></i>
+    <p>Karstat</p>
+  </div>
+
+  <div class="sidebar-item">
+    <i class="bi bi-sliders sidebar-icon" data-target="panel2" title="Filtres"></i>
+    <p>Filtres</p>
+  </div>
+
+  <div class="sidebar-item">
+    <i class="bi bi-layout-text-window sidebar-icon" data-target="panel3" title="Affichage"></i>
+    <p>Affichage</p>
+  </div>
+
+  <div class="sidebar-item">
+    <i class="bi bi-box-arrow-right sidebar-icon" title="Déconnexion"></i>
+    <p>Quitter</p>
+  </div>
+</div>
+<!-- Main Panel -->
+<div class="main-panel">
+  <div class="main-scroll">
+    <!-- Panel 1: Vue Région -->
+    <div class="panel-content active" id="region-panel">
+      <h4 class="section-title-head">Vue d'ensemble</h4>
+      <p class="sub-title-head">Statistiques globales</p>
+      
+      <div class="stat-section">
+        <div class="stat-box">
+          <i class="bi bi-person-check sidebar-icon fs-5"></i>
+          <div class="text-muted">Producteurs recensés</div>
+          <h5>1 254 000</h5>
+          <p>personnes</p>
+        </div>
+        <div class="stat-box">
+          <i class="bi bi-geo-alt sidebar-icon fs-5"></i>
+          <div class="text-muted">Parcelles recensées</div>
+          <h5>27 540</h5>
+          <p>unités</p>
+        </div>
+        <div class="stat-box">
+          <i class="bi bi-app sidebar-icon fs-5"></i>
+          <div class="text-muted">Surfaces recensées</div>
+          <h5>480 570</h5>
+          <p>hectares</p>
+        </div>
+      </div>
+
+      <p class="sub-title-body">Statistiques par régions</p>
+
+      <!-- Sélecteur de région -->
+      <div class="mb-3">
+        <select id="region-select" class="form-select">
+          <option value="">Sélectionnez une région</option>
+        </select>
+      </div>
+
+      <div class="region-box">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="region-title" id="region-name">Nom région</div>
+          <span class="badge bg-light text-muted" id="region-area">0 km²</span>
+        </div>
+        <table>
+          <tr>
+              <td>Population : </td>
+              <th id="region-population">0 habitants</th>
+          </tr>
+          <tr>
+              <td>Producteurs : </td>
+              <th id="region-producers">0</th>
+          </tr>
+          <tr>
+              <td>Parcelles : </td>
+              <th id="region-plots">0 unités - 0 ha</th>
+          </tr>
+          <tr>
+              <td>Rizicole : </td>
+              <th id="region-rice">0 ha</th>
+          </tr>
+          <tr>
+              <td>Production : </td>
+              <th id="region-production">0 tonnes</th>
+          </tr>
+          <tr>
+              <td>Rendement : </td>
+              <th id="region-yield">0 kg/ha</th>
+          </tr>
+          <tr>
+              <td>Exploitants : </td>
+              <th id="region-farmers">0</th>
+          </tr>
+        </table>
+        <div class="region-meta"><span class="text-end"></span></div>
+        <button class="btn-custom" id="view-districts-btn"><i class="bi bi-eye"></i>Voir les districts</button>
+        <button class="btn-custom" id="view-on-map-btn"><i class="bi bi-map"></i>Voir sur la carte</button>
+      </div>
+    </div>
+
+    <!-- Panel 2: Vue Districts -->
+    <div class="panel-content" id="districts-panel">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="section-title-head" id="districts-region-name">Districts de Menabe</h4>
+        <button class="btn-back" id="back-to-region-btn"><i class="bi bi-arrow-left"></i> Retour</button>
+      </div>
+      
+      <div class="districts-container" id="districts-list">
+        <!-- Les districts seront ajoutés dynamiquement ici -->
+      </div>
+    </div>
+
+    <!-- Panel 3: Vue Communes -->
+    <div class="panel-content" id="communes-panel">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="section-title-head" id="communes-district-name">Communes de Belo sur Tsiribihina</h4>
+        <button class="btn-back" id="back-to-districts-btn"><i class="bi bi-arrow-left"></i> Retour</button>
+      </div>
+      
+      <div class="communes-container" id="communes-list">
+        <!-- Les communes seront ajoutées dynamiquement ici -->
+      </div>
+    </div>
+
+    <!-- Panel 4: Vue Fokontany -->
+    <div class="panel-content" id="fokontany-panel">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="section-title-head" id="fokontany-commune-name">Fokontany de Belo sur Tsiribihina Ville</h4>
+        <button class="btn-back" id="back-to-communes-btn"><i class="bi bi-arrow-left"></i> Retour</button>
+      </div>
+      
+      <div class="fokontany-container" id="fokontany-list">
+        <!-- Les fokontany seront ajoutés dynamiquement ici -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Map panel -->
+<div class="map-panel">
+  <div id="map" style="width: 100%; height: 700px;"></div>
+</div>
+
+<!-- Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  // Données complètes avec tous les districts, communes et fokontany de Menabe
+  const regionsData = {
+    "menabe": {
+      "name": "Menabe",
+      "area": "46,121 km²",
+      "population": "592,113",
+      "producers": "130,000",
+      "plots": "3,000 unités - 58,000 ha",
+      "rice": "23,000 ha",
+      "production": "69,000 tonnes",
+      "yield": "3,000 kg/ha",
+      "farmers": "110,000",
+      "districts": [
+        {
+          "name": "BELO SUR TSIRIBIHINA",
+          "population": "150,000",
+          "producers": "12,000",
+          "plots": "8,500 unités",
+          "rice": "12,500 ha",
+          "production": "37,500 tonnes",
+          "yield": "3,000 kg/ha",
+          "farmers": "11,000",
+          "communes": [
+            {
+              "name": "Belo sur Tsiribihina Ville",
+              "population": "45,000",
+              "producers": "3,500",
+              "plots": "2,500 unités",
+              "rice": "3,800 ha",
+              "production": "11,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Ambalakida",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankilibe",
+                  "population": "4,500",
+                  "producers": "350",
+                  "plots": "280 unités",
+                  "rice": "420 ha",
+                  "production": "1,260 tonnes"
+                },
+                {
+                  "name": "Tsaramandroso",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "400 unités",
+                  "rice": "600 ha",
+                  "production": "1,800 tonnes"
+                },
+                {
+                  "name": "Anosimena",
+                  "population": "5,500",
+                  "producers": "450",
+                  "plots": "350 unités",
+                  "rice": "525 ha",
+                  "production": "1,575 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Ankirijibe",
+              "population": "25,000",
+              "producers": "2,100",
+              "plots": "1,500 unités",
+              "rice": "2,300 ha",
+              "production": "6,900 tonnes",
+              "fokontany": [
+                {
+                  "name": "Ankirijibe Centre",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "690 ha",
+                  "production": "2,070 tonnes"
+                },
+                {
+                  "name": "Ambohimena",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "375 unités",
+                  "rice": "575 ha",
+                  "production": "1,725 tonnes"
+                },
+                {
+                  "name": "Andranomavo",
+                  "population": "5,500",
+                  "producers": "450",
+                  "plots": "340 unités",
+                  "rice": "510 ha",
+                  "production": "1,530 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "6,500",
+                  "producers": "550",
+                  "plots": "410 unités",
+                  "rice": "615 ha",
+                  "production": "1,845 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Bemanonga",
+              "population": "30,000",
+              "producers": "2,500",
+              "plots": "1,800 unités",
+              "rice": "2,700 ha",
+              "production": "8,100 tonnes",
+              "fokontany": [
+                {
+                  "name": "Bemanonga Centre",
+                  "population": "8,000",
+                  "producers": "700",
+                  "plots": "500 unités",
+                  "rice": "750 ha",
+                  "production": "2,250 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "675 ha",
+                  "production": "2,025 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "7,500",
+                  "producers": "650",
+                  "plots": "490 unités",
+                  "rice": "735 ha",
+                  "production": "2,205 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "7,500",
+                  "producers": "650",
+                  "plots": "490 unités",
+                  "rice": "735 ha",
+                  "production": "2,205 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Masoarivo",
+              "population": "20,000",
+              "producers": "1,700",
+              "plots": "1,200 unités",
+              "rice": "1,800 ha",
+              "production": "5,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Masoarivo Centre",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "360 unités",
+                  "rice": "540 ha",
+                  "production": "1,620 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "MAHABO",
+          "population": "90,000",
+          "producers": "7,500",
+          "plots": "5,200 unités",
+          "rice": "7,800 ha",
+          "production": "23,400 tonnes",
+          "yield": "3,000 kg/ha",
+          "farmers": "7,000",
+          "communes": [
+            {
+              "name": "Mahabo Ville",
+              "population": "30,000",
+              "producers": "2,500",
+              "plots": "1,800 unités",
+              "rice": "2,700 ha",
+              "production": "8,100 tonnes",
+              "fokontany": [
+                {
+                  "name": "Mahabo Centre",
+                  "population": "10,000",
+                  "producers": "850",
+                  "plots": "600 unités",
+                  "rice": "900 ha",
+                  "production": "2,700 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "675 ha",
+                  "production": "2,025 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "6,500",
+                  "producers": "550",
+                  "plots": "400 unités",
+                  "rice": "600 ha",
+                  "production": "1,800 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "6,500",
+                  "producers": "550",
+                  "plots": "400 unités",
+                  "rice": "600 ha",
+                  "production": "1,800 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Beroboka",
+              "population": "25,000",
+              "producers": "2,100",
+              "plots": "1,500 unités",
+              "rice": "2,250 ha",
+              "production": "6,750 tonnes",
+              "fokontany": [
+                {
+                  "name": "Beroboka Centre",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "675 ha",
+                  "production": "2,025 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "375 unités",
+                  "rice": "560 ha",
+                  "production": "1,680 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "375 unités",
+                  "rice": "560 ha",
+                  "production": "1,680 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "375 unités",
+                  "rice": "560 ha",
+                  "production": "1,680 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Betsipolitra",
+              "population": "20,000",
+              "producers": "1,700",
+              "plots": "1,200 unités",
+              "rice": "1,800 ha",
+              "production": "5,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Betsipolitra Centre",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "360 unités",
+                  "rice": "540 ha",
+                  "production": "1,620 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "MORONDAVA",
+          "population": "120,000",
+          "producers": "10,000",
+          "plots": "7,000 unités",
+          "rice": "10,500 ha",
+          "production": "31,500 tonnes",
+          "yield": "3,000 kg/ha",
+          "farmers": "9,500",
+          "communes": [
+            {
+              "name": "Morondava Ville",
+              "population": "50,000",
+              "producers": "4,200",
+              "plots": "3,000 unités",
+              "rice": "4,500 ha",
+              "production": "13,500 tonnes",
+              "fokontany": [
+                {
+                  "name": "Morondava Centre",
+                  "population": "15,000",
+                  "producers": "1,300",
+                  "plots": "900 unités",
+                  "rice": "1,350 ha",
+                  "production": "4,050 tonnes"
+                },
+                {
+                  "name": "Ambalahonko",
+                  "population": "12,000",
+                  "producers": "1,000",
+                  "plots": "750 unités",
+                  "rice": "1,125 ha",
+                  "production": "3,375 tonnes"
+                },
+                {
+                  "name": "Amborovy",
+                  "population": "11,000",
+                  "producers": "900",
+                  "plots": "650 unités",
+                  "rice": "975 ha",
+                  "production": "2,925 tonnes"
+                },
+                {
+                  "name": "Ankilibe",
+                  "population": "12,000",
+                  "producers": "1,000",
+                  "plots": "750 unités",
+                  "rice": "1,125 ha",
+                  "production": "3,375 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Belo sur Mer",
+              "population": "25,000",
+              "producers": "2,100",
+              "plots": "1,500 unités",
+              "rice": "2,250 ha",
+              "production": "6,750 tonnes",
+              "fokontany": [
+                {
+                  "name": "Belo sur Mer Centre",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "675 ha",
+                  "production": "2,025 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "375 unités",
+                  "rice": "560 ha",
+                  "production": "1,680 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "375 unités",
+                  "rice": "560 ha",
+                  "production": "1,680 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "375 unités",
+                  "rice": "560 ha",
+                  "production": "1,680 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Nosy Kely",
+              "population": "20,000",
+              "producers": "1,700",
+              "plots": "1,200 unités",
+              "rice": "1,800 ha",
+              "production": "5,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Nosy Kely Centre",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "360 unités",
+                  "rice": "540 ha",
+                  "production": "1,620 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "MIANDRIVAZO",
+          "population": "100,000",
+          "producers": "8,500",
+          "plots": "6,000 unités",
+          "rice": "9,000 ha",
+          "production": "27,000 tonnes",
+          "yield": "3,000 kg/ha",
+          "farmers": "8,000",
+          "communes": [
+            {
+              "name": "Miandrivazo Ville",
+              "population": "40,000",
+              "producers": "3,400",
+              "plots": "2,400 unités",
+              "rice": "3,600 ha",
+              "production": "10,800 tonnes",
+              "fokontany": [
+                {
+                  "name": "Miandrivazo Centre",
+                  "population": "12,000",
+                  "producers": "1,000",
+                  "plots": "750 unités",
+                  "rice": "1,125 ha",
+                  "production": "3,375 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "10,000",
+                  "producers": "850",
+                  "plots": "600 unités",
+                  "rice": "900 ha",
+                  "production": "2,700 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "9,000",
+                  "producers": "750",
+                  "plots": "550 unités",
+                  "rice": "825 ha",
+                  "production": "2,475 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "9,000",
+                  "producers": "750",
+                  "plots": "550 unités",
+                  "rice": "825 ha",
+                  "production": "2,475 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Ankavandra",
+              "population": "20,000",
+              "producers": "1,700",
+              "plots": "1,200 unités",
+              "rice": "1,800 ha",
+              "production": "5,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Ankavandra Centre",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "360 unités",
+                  "rice": "540 ha",
+                  "production": "1,620 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Antanimbary",
+              "population": "20,000",
+              "producers": "1,700",
+              "plots": "1,200 unités",
+              "rice": "1,800 ha",
+              "production": "5,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Antanimbary Centre",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "360 unités",
+                  "rice": "540 ha",
+                  "production": "1,620 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Mandabe",
+              "population": "20,000",
+              "producers": "1,700",
+              "plots": "1,200 unités",
+              "rice": "1,800 ha",
+              "production": "5,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Mandabe Centre",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "360 unités",
+                  "rice": "540 ha",
+                  "production": "1,620 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "MANJA",
+          "population": "80,000",
+          "producers": "6,800",
+          "plots": "4,800 unités",
+          "rice": "7,200 ha",
+          "production": "21,600 tonnes",
+          "yield": "3,000 kg/ha",
+          "farmers": "6,500",
+          "communes": [
+            {
+              "name": "Manja Ville",
+              "population": "30,000",
+              "producers": "2,500",
+              "plots": "1,800 unités",
+              "rice": "2,700 ha",
+              "production": "8,100 tonnes",
+              "fokontany": [
+                {
+                  "name": "Manja Centre",
+                  "population": "9,000",
+                  "producers": "750",
+                  "plots": "550 unités",
+                  "rice": "825 ha",
+                  "production": "2,475 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "675 ha",
+                  "production": "2,025 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "675 ha",
+                  "production": "2,025 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "7,000",
+                  "producers": "600",
+                  "plots": "450 unités",
+                  "rice": "675 ha",
+                  "production": "2,025 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Ambalanjanakomby",
+              "population": "20,000",
+              "producers": "1,700",
+              "plots": "1,200 unités",
+              "rice": "1,800 ha",
+              "production": "5,400 tonnes",
+              "fokontany": [
+                {
+                  "name": "Ambalanjanakomby Centre",
+                  "population": "6,000",
+                  "producers": "500",
+                  "plots": "360 unités",
+                  "rice": "540 ha",
+                  "production": "1,620 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "4,500",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Ankotrofotsy",
+              "population": "15,000",
+              "producers": "1,300",
+              "plots": "900 unités",
+              "rice": "1,350 ha",
+              "production": "4,050 tonnes",
+              "fokontany": [
+                {
+                  "name": "Ankotrofotsy Centre",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "4,000",
+                  "producers": "300",
+                  "plots": "225 unités",
+                  "rice": "340 ha",
+                  "production": "1,020 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "3,000",
+                  "producers": "300",
+                  "plots": "225 unités",
+                  "rice": "340 ha",
+                  "production": "1,020 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "3,000",
+                  "producers": "300",
+                  "plots": "225 unités",
+                  "rice": "340 ha",
+                  "production": "1,020 tonnes"
+                }
+              ]
+            },
+            {
+              "name": "Antanimena",
+              "population": "15,000",
+              "producers": "1,300",
+              "plots": "900 unités",
+              "rice": "1,350 ha",
+              "production": "4,050 tonnes",
+              "fokontany": [
+                {
+                  "name": "Antanimena Centre",
+                  "population": "5,000",
+                  "producers": "400",
+                  "plots": "300 unités",
+                  "rice": "450 ha",
+                  "production": "1,350 tonnes"
+                },
+                {
+                  "name": "Andranomena",
+                  "population": "4,000",
+                  "producers": "300",
+                  "plots": "225 unités",
+                  "rice": "340 ha",
+                  "production": "1,020 tonnes"
+                },
+                {
+                  "name": "Ankiliabo",
+                  "population": "3,000",
+                  "producers": "300",
+                  "plots": "225 unités",
+                  "rice": "340 ha",
+                  "production": "1,020 tonnes"
+                },
+                {
+                  "name": "Ankondro",
+                  "population": "3,000",
+                  "producers": "300",
+                  "plots": "225 unités",
+                  "rice": "340 ha",
+                  "production": "1,020 tonnes"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  };
+
+  // Variables globales
+  let map;
+  let geoJsonLayer;
+  let currentRegion = null;
+  let currentDistrict = null;
+  let currentCommune = null;
+  let currentFokontany = null;
+  let regionPolygons = {};
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initialiser la carte
+    initMap();
+    
+    // Initialiser l'interface
+    initUI();
+  });
+
+  function initMap() {
+    // Centrer sur Madagascar
+    map = L.map('map').setView([-19.0, 47.5], 6);
+
+    // Ajouter la couche de tuiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Charger les données GeoJSON
+    loadGeoJsonData();
+
+    // Ajouter des marqueurs de démonstration
+    addDemoMarkers();
+  }
+
+  // Fonction pour charger les données GeoJSON
+  function loadGeoJsonData() {
+    fetch('<%= geojson_data_path %>')  // Call your Rails endpoint
+      .then(response => response.json())
+      .then(data => {
+            // Supprimer la couche précédente si elle existe
+            if (geoJsonLayer) {
+                map.removeLayer(geoJsonLayer);
+            }
+
+            // Ajouter la nouvelle couche GeoJSON avec les bons comportements
+            geoJsonLayer = L.geoJSON(data, {
+                style: function (feature) {
+                    return {
+                          fillColor: "#e57373",  // rose clair
+                          color: "#111",         // NOIR intense pour la délimitation
+                          weight: 1,           // épaisseur de trait plus visible
+                          opacity: 1,
+                          fillOpacity: 0.2
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+                    const regionName = feature.properties.name;
+                    const regionId = regionName.toLowerCase().replace(/ /g, '-');
+                    
+                    // Stocker la référence du polygone
+                    regionPolygons[regionId] = layer;
+                    
+                    layer.on({
+                        mouseover: function (e) {
+                            var layer = e.target;
+                            layer.setStyle({
+                                fillColor: "#ffff00", // Jaune
+                                weight: 1,
+                                fillOpacity: 0.5
+                            });
+                            layer.bindTooltip(feature.properties.name, {
+                                permanent: false,
+                                direction: "center",
+                                className: "region-badge"
+                            }).openTooltip();
+                        },
+                        mouseout: function (e) {
+                            geoJsonLayer.resetStyle(e.target);
+                            e.target.closeTooltip();
+                        },
+                        click: function (e) {
+                            // Popup moderne (badge)
+                            layer.bindPopup(`
+                              <div class="region-badge-popup">
+                                  <div class="region-badge">${feature.properties.name}</div>
+                              </div>
+                            `, { className: 'custom-leaflet-popup' }).openPopup();
+                            
+                            // Mettre à jour l'interface
+                            const regionId = feature.properties.name.toLowerCase().replace(/ /g, '-');
+                            updateRegionInfo('menabe'); // Ici on utilise 'menabe' car c'est la seule région dans nos données
+                            document.getElementById('region-select').value = regionId;
+                            currentRegion = regionId;
+                        }
+                    });
+                }
+            }).addTo(map);
+
+            // Adapter la vue de la carte à la couche chargée
+            map.fitBounds(geoJsonLayer.getBounds());
+        })
+        .catch(error => console.error('Erreur lors du chargement des données :', error));
+  }
+
+  function initUI() {
+    // Remplir le sélecteur de régions
+    const regionSelect = document.getElementById('region-select');
+    for (const regionId in regionsData) {
+      const option = document.createElement('option');
+      option.value = regionId;
+      option.textContent = regionsData[regionId].name;
+      regionSelect.appendChild(option);
+    }
+
+    // Écouter les changements de sélection de région
+    regionSelect.addEventListener('change', function() {
+      const selectedRegion = this.value;
+      if (selectedRegion) {
+        currentRegion = selectedRegion;
+        updateRegionInfo(selectedRegion);
+        highlightRegionOnMap(selectedRegion);
+      }
+    });
+
+    // Bouton "Voir les districts"
+    document.getElementById('view-districts-btn').addEventListener('click', function() {
+      if (currentRegion) {
+        showDistrictsPanel(currentRegion);
+      }
+    });
+
+    // Bouton "Voir sur la carte"
+    document.getElementById('view-on-map-btn').addEventListener('click', function() {
+      if (currentRegion && regionPolygons[currentRegion]) {
+        map.fitBounds(regionPolygons[currentRegion].getBounds());
+        highlightRegionOnMap(currentRegion);
+      }
+    });
+
+    // Bouton "Retour" depuis les districts
+    document.getElementById('back-to-region-btn').addEventListener('click', function() {
+      showRegionPanel();
+      if (currentRegion) {
+        highlightRegionOnMap(currentRegion);
+      }
+    });
+
+    // Bouton "Retour" depuis les communes
+    document.getElementById('back-to-districts-btn').addEventListener('click', function() {
+      showDistrictsPanel(currentRegion);
+      if (currentDistrict) {
+        focusOnDistrict(currentRegion, currentDistrict);
+      }
+    });
+
+    // Bouton "Retour" depuis les fokontany
+    document.getElementById('back-to-communes-btn').addEventListener('click', function() {
+      showCommunesPanel(currentRegion, currentDistrict);
+      if (currentCommune) {
+        focusOnCommune(currentRegion, currentDistrict, currentCommune);
+      }
+    });
+  }
+
+  function updateRegionInfo(regionId) {
+    const region = regionsData[regionId];
+    if (region) {
+      document.getElementById('region-name').textContent = region.name;
+      document.getElementById('region-area').textContent = region.area;
+      document.getElementById('region-population').textContent = region.population + " habitants";
+      document.getElementById('region-producers').textContent = region.producers;
+      document.getElementById('region-plots').textContent = region.plots;
+      document.getElementById('region-rice').textContent = region.rice;
+      document.getElementById('region-production').textContent = region.production;
+      document.getElementById('region-yield').textContent = region.yield;
+      document.getElementById('region-farmers').textContent = region.farmers;
+    }
+  }
+
+  function highlightRegionOnMap(regionId) {
+    // Réinitialiser tous les styles
+    if (geoJsonLayer) {
+      geoJsonLayer.eachLayer(function(layer) {
+        layer.setStyle({
+          fillColor: "#e57373",
+          fillOpacity: 0.2
+        });
+      });
+    }
+
+    // Mettre en évidence la région sélectionnée
+    if (regionPolygons[regionId]) {
+      regionPolygons[regionId].setStyle({
+        fillColor: "#ff0000",
+        fillOpacity: 0.5
+      });
+      map.fitBounds(regionPolygons[regionId].getBounds());
+    }
+  }
+
+  function showDistrictsPanel(regionId) {
+    const region = regionsData[regionId];
+    if (!region || !region.districts) return;
+
+    // Mettre à jour le titre
+    document.getElementById('districts-region-name').textContent = `Districts de ${region.name}`;
+    
+    // Remplir la liste des districts
+    const districtsList = document.getElementById('districts-list');
+    districtsList.innerHTML = '';
+
+    region.districts.forEach(district => {
+        const isSelectableDistrict = district.name === "BELO SUR TSIRIBIHINA";
+        
+        const districtElement = document.createElement('div');
+        districtElement.className = 'district-card';
+        districtElement.innerHTML = `
+            <div class="district-header">
+                <h5>${district.name}</h5>
+                <span class="badge bg-light text-dark">${district.population} habitants</span>
+            </div>
+            <table class="district-table">
+          <tr>
+            <td>Producteurs :</td>
+            <th>${district.producers}</th>
+          </tr>
+          <tr>
+            <td>Parcelles :</td>
+            <th>${district.plots}</th>
+          </tr>
+          <tr>
+            <td>Surface rizicole :</td>
+            <th>${district.rice}</th>
+          </tr>
+          <tr>
+            <td>Production :</td>
+            <th>${district.production}</th>
+          </tr>
+          <tr>
+            <td>Rendement :</td>
+            <th>${district.yield}</th>
+          </tr>
+        </table>
+            <div class="district-actions">
+                <button class="btn-view-district ${!isSelectableDistrict ? 'disabled' : ''}" 
+                        data-district="${district.name}"
+                        ${!isSelectableDistrict ? 'disabled' : ''}>
+                    <i class="bi bi-map"></i> Voir sur carte
+                </button>
+                <button class="btn-view-communes ${!isSelectableDistrict ? 'disabled' : ''}" 
+                        data-district="${district.name}"
+                        ${!isSelectableDistrict ? 'disabled' : ''}>
+                    <i class="bi bi-list-ul"></i> Voir communes
+                </button>
+            </div>
+        `;
+        districtsList.appendChild(districtElement);
+    });
+
+    // Basculer vers le panel des districts
+    switchPanel('districts-panel');
+
+    // Ajouter les écouteurs d'événements seulement pour les boutons activés
+    document.querySelectorAll('.btn-view-district:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const districtName = this.getAttribute('data-district');
+            currentDistrict = districtName;
+            focusOnDistrict(regionId, districtName);
+        });
+    });
+
+    document.querySelectorAll('.btn-view-communes:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const districtName = this.getAttribute('data-district');
+            showCommunesPanel(regionId, districtName);
+        });
+    });
+}
+
+function showCommunesPanel(regionId, districtName) {
+    const region = regionsData[regionId];
+    if (!region || !region.districts) return;
+
+    // Trouver le district sélectionné
+    const district = region.districts.find(d => d.name === districtName);
+    if (!district || !district.communes) return;
+
+    currentDistrict = districtName;
+
+    // Mettre à jour le titre
+    document.getElementById('communes-district-name').textContent = `Communes de ${districtName}`;
+    
+    // Remplir la liste des communes
+    const communesList = document.getElementById('communes-list');
+    communesList.innerHTML = '';
+
+    district.communes.forEach(commune => {
+        const isSelectableCommune = districtName === "BELO SUR TSIRIBIHINA" && 
+                                   commune.name === "Belo sur Tsiribihina Ville";
+        
+        const communeElement = document.createElement('div');
+        communeElement.className = 'commune-card';
+        communeElement.innerHTML = `
+            <div class="commune-header">
+                <h5>${commune.name}</h5>
+                <span class="badge bg-light text-dark">${commune.population} habitants</span>
+            </div>
+            <table class="commune-table">
+                <tr>
+                  <td>Producteurs :</td>
+                  <th>${commune.producers}</th>
+                </tr>
+                <tr>
+                  <td>Parcelles :</td>
+                  <th>${commune.plots}</th>
+                </tr>
+                <tr>
+                  <td>Surface rizicole :</td>
+                  <th>${commune.rice}</th>
+                </tr>
+                <tr>
+                  <td>Production :</td>
+                  <th>${commune.production}</th>
+                </tr>
+            </table>
+            <div class="commune-actions">
+                <button class="btn-view-commune ${!isSelectableCommune ? 'disabled' : ''}" 
+                        data-commune="${commune.name}"
+                        ${!isSelectableCommune ? 'disabled' : ''}>
+                    <i class="bi bi-map"></i> Voir sur carte
+                </button>
+                <button class="btn-view-fokontany ${!isSelectableCommune ? 'disabled' : ''}" 
+                        data-commune="${commune.name}"
+                        ${!isSelectableCommune ? 'disabled' : ''}>
+                    <i class="bi bi-list-ul"></i> Voir fokontany
+                </button>
+            </div>
+        `;
+        communesList.appendChild(communeElement);
+    });
+
+    // Basculer vers le panel des communes
+    switchPanel('communes-panel');
+
+    // Ajouter les écouteurs d'événements seulement pour les boutons activés
+    document.querySelectorAll('.btn-view-commune:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const communeName = this.getAttribute('data-commune');
+            currentCommune = communeName;
+            focusOnCommune(regionId, districtName, communeName);
+        });
+    });
+
+    document.querySelectorAll('.btn-view-fokontany:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const communeName = this.getAttribute('data-commune');
+            showFokontanyPanel(regionId, districtName, communeName);
+        });
+    });
+}
+
+function showFokontanyPanel(regionId, districtName, communeName) {
+    const region = regionsData[regionId];
+    if (!region || !region.districts) return;
+
+    // Trouver le district et la commune sélectionnés
+    const district = region.districts.find(d => d.name === districtName);
+    if (!district || !district.communes) return;
+
+    const commune = district.communes.find(c => c.name === communeName);
+    if (!commune || !commune.fokontany) return;
+
+    currentCommune = communeName;
+
+    // Mettre à jour le titre
+    document.getElementById('fokontany-commune-name').textContent = `Fokontany de ${communeName}`;
+    
+    // Remplir la liste des fokontany
+    const fokontanyList = document.getElementById('fokontany-list');
+    fokontanyList.innerHTML = '';
+
+    commune.fokontany.forEach(fokontany => {
+        const isSelectableFokontany = districtName === "BELO SUR TSIRIBIHINA" && 
+                                    communeName === "Belo sur Tsiribihina Ville" && 
+                                    fokontany.name === "Ambalakida";
+        
+        const fokontanyElement = document.createElement('div');
+        fokontanyElement.className = 'fokontany-card';
+        fokontanyElement.innerHTML = `
+            <div class="fokontany-header">
+                <h5>${fokontany.name}</h5>
+                <span class="badge bg-light text-dark">${fokontany.population} habitants</span>
+            </div>
+            <table class="fokontany-table">
+                <tr>
+            <td>Producteurs :</td>
+            <th>${fokontany.producers}</th>
+          </tr>
+          <tr>
+            <td>Parcelles :</td>
+            <th>${fokontany.plots}</th>
+          </tr>
+          <tr>
+            <td>Surface rizicole :</td>
+            <th>${fokontany.rice}</th>
+          </tr>
+          <tr>
+            <td>Production :</td>
+            <th>${fokontany.production}</th>
+          </tr>
+            </table>
+            <button class="btn-view-fokontany ${!isSelectableFokontany ? 'disabled' : ''}" 
+                    data-fokontany="${fokontany.name}"
+                    ${!isSelectableFokontany ? 'disabled' : ''}>
+                <i class="bi bi-map"></i> Voir sur carte
+            </button>
+        `;
+        fokontanyList.appendChild(fokontanyElement);
+    });
+
+    // Basculer vers le panel des fokontany
+    switchPanel('fokontany-panel');
+
+    // Ajouter les écouteurs d'événements seulement pour les boutons activés
+    document.querySelectorAll('.btn-view-fokontany:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const fokontanyName = this.getAttribute('data-fokontany');
+            currentFokontany = fokontanyName;
+            focusOnFokontany(regionId, districtName, communeName, fokontanyName);
+        });
+    });
+}
+  function showRegionPanel() {
+    switchPanel('region-panel');
+  }
+
+  function switchPanel(panelId) {
+    // Masquer tous les panels
+    document.querySelectorAll('.panel-content').forEach(panel => {
+      panel.classList.remove('active');
+    });
+    
+    // Afficher le panel demandé
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  function addDemoMarkers() {
+    // Coordonnées approximatives pour tous les districts, communes et fokontany de Menabe
+    const demoCoords = {
+      // Districts
+      "BELO SUR TSIRIBIHINA": [-19.7, 44.55],
+      "MAHABO": [-19.85, 44.65],
+      "MORONDAVA": [-20.28, 44.28],
+      "MIANDRIVAZO": [-19.52, 45.45],
+      "MANJA": [-21.43, 44.32],
+      
+      // Communes de Belo sur Tsiribihina
+      "Belo sur Tsiribihina Ville": [-19.7, 44.55],
+      "Ankirijibe": [-19.65, 44.6],
+      "Bemanonga": [-19.75, 44.5],
+      "Masoarivo": [-19.8, 44.58],
+      
+      // Fokontany de Belo sur Tsiribihina Ville
+      "Ambalakida": [-19.72, 44.56],
+      "Ankilibe": [-19.71, 44.54],
+      "Tsaramandroso": [-19.69, 44.57],
+      "Anosimena": [-19.7, 44.53],
+      
+      // Communes de Mahabo
+      "Mahabo Ville": [-19.85, 44.65],
+      "Beroboka": [-19.9, 44.6],
+      "Betsipolitra": [-19.88, 44.7],
+      
+      // Communes de Morondava
+      "Morondava Ville": [-20.28, 44.28],
+      "Belo sur Mer": [-20.25, 44.25],
+      "Nosy Kely": [-20.3, 44.3],
+      
+      // Communes de Miandrivazo
+      "Miandrivazo Ville": [-19.52, 45.45],
+      "Ankavandra": [-18.85, 45.35],
+      "Antanimbary": [-19.6, 45.5],
+      "Mandabe": [-19.45, 45.4],
+      
+      // Communes de Manja
+      "Manja Ville": [-21.43, 44.32],
+      "Ambalanjanakomby": [-21.5, 44.35],
+      "Ankotrofotsy": [-21.4, 44.4],
+      "Antanimena": [-21.45, 44.3]
+    };
+
+    // Ajouter des marqueurs pour chaque emplacement
+    for (const location in demoCoords) {
+      const marker = L.marker(demoCoords[location], {
+        icon: L.divIcon({
+          className: 'location-marker',
+          html: `<div class="marker-label">${location}</div>`,
+          iconSize: [100, 30]
+        })
+      }).addTo(map);
+      
+      marker.on('click', function() {
+        showLocationDetails(location);
+      });
+    }
+  }
+
+  function focusOnRegion(regionId) {
+    // Centrer sur la région
+    if (regionPolygons[regionId]) {
+      map.fitBounds(regionPolygons[regionId].getBounds());
+      highlightRegionOnMap(regionId);
+    }
+  }
+
+  function focusOnDistrict(regionId, districtName) {
+    // Centrer sur le district
+    const districtCoords = {
+      "BELO SUR TSIRIBIHINA": [-19.7, 44.55],
+      "MAHABO": [-19.85, 44.65],
+      "MORONDAVA": [-20.28, 44.28],
+      "MIANDRIVAZO": [-19.52, 45.45],
+      "MANJA": [-21.43, 44.32]
+    };
+    
+    if (districtCoords[districtName]) {
+      map.setView(districtCoords[districtName], 10);
+    }
+  }
+
+  function focusOnCommune(regionId, districtName, communeName) {
+    // Centrer sur la commune
+    const communeCoords = {
+      // Communes de Belo sur Tsiribihina
+      "Belo sur Tsiribihina Ville": [-19.7, 44.55],
+      "Ankirijibe": [-19.65, 44.6],
+      "Bemanonga": [-19.75, 44.5],
+      "Masoarivo": [-19.8, 44.58],
+      
+      // Communes de Mahabo
+      "Mahabo Ville": [-19.85, 44.65],
+      "Beroboka": [-19.9, 44.6],
+      "Betsipolitra": [-19.88, 44.7],
+      
+      // Communes de Morondava
+      "Morondava Ville": [-20.28, 44.28],
+      "Belo sur Mer": [-20.25, 44.25],
+      "Nosy Kely": [-20.3, 44.3],
+      
+      // Communes de Miandrivazo
+      "Miandrivazo Ville": [-19.52, 45.45],
+      "Ankavandra": [-18.85, 45.35],
+      "Antanimbary": [-19.6, 45.5],
+      "Mandabe": [-19.45, 45.4],
+      
+      // Communes de Manja
+      "Manja Ville": [-21.43, 44.32],
+      "Ambalanjanakomby": [-21.5, 44.35],
+      "Ankotrofotsy": [-21.4, 44.4],
+      "Antanimena": [-21.45, 44.3]
+    };
+    
+    if (communeCoords[communeName]) {
+      map.setView(communeCoords[communeName], 12);
+    }
+  }
+
+  function focusOnFokontany(regionId, districtName, communeName, fokontanyName) {
+    // Centrer sur le fokontany
+    const fokontanyCoords = {
+      // Fokontany de Belo sur Tsiribihina Ville
+      "Ambalakida": [-19.72, 44.56],
+      "Ankilibe": [-19.71, 44.54],
+      "Tsaramandroso": [-19.69, 44.57],
+      "Anosimena": [-19.7, 44.53],
+      
+      // Fokontany d'Ankirijibe
+      "Ankirijibe Centre": [-19.65, 44.6],
+      "Ambohimena": [-19.64, 44.59],
+      "Andranomavo": [-19.66, 44.61],
+      "Ankiliabo": [-19.63, 44.58],
+      
+      // Fokontany de Bemanonga
+      "Bemanonga Centre": [-19.75, 44.5],
+      "Andranomena": [-19.74, 44.49],
+      "Ankiliabo": [-19.76, 44.51],
+      "Ankondro": [-19.77, 44.52],
+      
+      // Fokontany de Masoarivo
+      "Masoarivo Centre": [-19.8, 44.58],
+      "Andranomena": [-19.79, 44.57],
+      "Ankiliabo": [-19.81, 44.59],
+      "Ankondro": [-19.82, 44.6],
+      
+      // Fokontany de Mahabo Ville
+      "Mahabo Centre": [-19.85, 44.65],
+      "Andranomena": [-19.84, 44.64],
+      "Ankiliabo": [-19.86, 44.66],
+      "Ankondro": [-19.87, 44.67],
+      
+      // Fokontany de Beroboka
+      "Beroboka Centre": [-19.9, 44.6],
+      "Andranomena": [-19.89, 44.59],
+      "Ankiliabo": [-19.91, 44.61],
+      "Ankondro": [-19.92, 44.62],
+      
+      // Fokontany de Morondava Ville
+      "Morondava Centre": [-20.28, 44.28],
+      "Ambalahonko": [-20.27, 44.27],
+      "Amborovy": [-20.29, 44.29],
+      "Ankilibe": [-20.26, 44.26],
+      
+      // Fokontany de Miandrivazo Ville
+      "Miandrivazo Centre": [-19.52, 45.45],
+      "Andranomena": [-19.51, 45.44],
+      "Ankiliabo": [-19.53, 45.46],
+      "Ankondro": [-19.54, 45.47]
+    };
+    
+    if (fokontanyCoords[fokontanyName]) {
+      map.setView(fokontanyCoords[fokontanyName], 14);
+    }
+  }
+
+  function showLocationDetails(locationName) {
+    // Vérifier si c'est une région
+    for (const regionId in regionsData) {
+      if (regionsData[regionId].name === locationName) {
+        currentRegion = regionId;
+        updateRegionInfo(regionId);
+        showRegionPanel();
+        highlightRegionOnMap(regionId);
+        return;
+      }
+    }
+    
+    // Vérifier si c'est un district
+    for (const regionId in regionsData) {
+      const region = regionsData[regionId];
+      if (region.districts) {
+        const district = region.districts.find(d => d.name === locationName);
+        if (district) {
+          currentRegion = regionId;
+          currentDistrict = locationName;
+          showDistrictsPanel(regionId);
+          focusOnDistrict(regionId, locationName);
+          return;
+        }
+      }
+    }
+    
+    // Vérifier si c'est une commune
+    for (const regionId in regionsData) {
+      const region = regionsData[regionId];
+      if (region.districts) {
+        for (const district of region.districts) {
+          if (district.communes) {
+            const commune = district.communes.find(c => c.name === locationName);
+            if (commune) {
+              currentRegion = regionId;
+              currentDistrict = district.name;
+              currentCommune = locationName;
+              showCommunesPanel(regionId, district.name);
+              focusOnCommune(regionId, district.name, locationName);
+              return;
+            }
+          }
+        }
+      }
+    }
+    
+    // Vérifier si c'est un fokontany
+    for (const regionId in regionsData) {
+      const region = regionsData[regionId];
+      if (region.districts) {
+        for (const district of region.districts) {
+          if (district.communes) {
+            for (const commune of district.communes) {
+              if (commune.fokontany) {
+                const fokontany = commune.fokontany.find(f => f.name === locationName);
+                if (fokontany) {
+                  currentRegion = regionId;
+                  currentDistrict = district.name;
+                  currentCommune = commune.name;
+                  currentFokontany = locationName;
+                  showFokontanyPanel(regionId, district.name, commune.name);
+                  focusOnFokontany(regionId, district.name, commune.name, locationName);
+                  return;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+</script>

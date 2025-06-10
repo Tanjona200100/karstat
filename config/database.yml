@@ -1,0 +1,20 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  username: postgres        # <-- remplace par ton nom d'utilisateur si besoin
+  password: root              # <-- mets ici ton mot de passe PostgreSQL
+  host: localhost
+
+development:
+  <<: *default
+  database: parcelles_madagascar
+
+test:
+  <<: *default
+  database: parcelles_madagascar_test
+
+production:
+  <<: *default
+  database: parcelles_madagascar_production
+  username: madagascar_map
+  password: <%= ENV["MADAGASCAR_MAP_DATABASE_PASSWORD"] %>
